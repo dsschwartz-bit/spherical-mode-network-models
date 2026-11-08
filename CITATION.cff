@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Spherical-mode network models for antennas"
+authors:
+  - family-names: "Schwartz"
+    given-names: "David"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Spherical-Mode Network Modeling of Antennas: Applications to Direct Antenna Modulation and Ultra-Wideband Communications"
+  authors:
+    - family-names: "Schwartz"
+      given-names: "David"
+  # Not yet published: add the co-authors, journal, year, volume, pages and doi on publication.

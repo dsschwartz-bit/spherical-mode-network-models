@@ -1,0 +1,15 @@
+// Rotation matrix R(rot_angle,Ux,Uy,Uz), Rodrigues' rotation formula
+// magU = |axis vector| = sqrt(Ux^2+Uy^2+Uz^2), computed once here
+// and reused below rather than recomputed in every Rij entry.
+// Paste into an ADS Eqn (equation) component; rot_angle, Ux, Uy, Uz
+// must already be defined as ADS variables (e.g. in a VAR block).
+magU=sqrt(Ux**2+Uy**2+Uz**2);
+R11=(Ux**2+(Uy**2+Uz**2)*cos(rot_angle))/magU**2;
+R12=(Ux*Uy-Ux*Uy*cos(rot_angle)-magU*Uz*sin(rot_angle))/magU**2;
+R13=(Ux*Uz-Ux*Uz*cos(rot_angle)+magU*Uy*sin(rot_angle))/magU**2;
+R21=(Ux*Uy-Ux*Uy*cos(rot_angle)+magU*Uz*sin(rot_angle))/magU**2;
+R22=(Uy**2+(Ux**2+Uz**2)*cos(rot_angle))/magU**2;
+R23=(Uy*Uz-Uy*Uz*cos(rot_angle)-magU*Ux*sin(rot_angle))/magU**2;
+R31=(Ux*Uz-Ux*Uz*cos(rot_angle)-magU*Uy*sin(rot_angle))/magU**2;
+R32=(Uy*Uz-Uy*Uz*cos(rot_angle)+magU*Ux*sin(rot_angle))/magU**2;
+R33=(Uz**2+(Ux**2+Uy**2)*cos(rot_angle))/magU**2;

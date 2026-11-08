@@ -1,0 +1,47 @@
+// Sph2Cart: maps spherical vector components {Vr,Vtheta,Vphi},
+// specified at the ORIGINAL frame's (theta,phi), to Cartesian
+// components {Vx,Vy,Vz}.
+//
+// Cart2Sph: maps Cartesian components {Vx,Vy,Vz} back to spherical
+// components {Vr,Vtheta,Vphi}, evaluated at the ROTATED SAMPLE
+// LOCATION (x_rot,y_rot,z_rot) -- built purely from Cartesian
+// ratios (r_rot=sqrt(x_rot^2+y_rot^2+z_rot^2),
+// rho_rot=sqrt(x_rot^2+y_rot^2)), with NO sin/cos/inverse-trig of
+// theta_rot,phi_rot appearing in Cart2Sph_ij itself. x_rot,y_rot,
+// z_rot must already be defined upstream as the rotated position
+// (x,y,z)=r*rhat(theta,phi) after applying
+// Rotation_lib:RotationMatrix_vars -- this is a DIFFERENT rotated
+// vector than the field Vx_rot,Vy_rot,Vz_rot; see
+// create_vector_rotation_vars.py.
+//
+// theta_rot,phi_rot below are REPORTING-ONLY: the new sample
+// location's spherical coordinates, for output purposes -- not
+// used anywhere in Cart2Sph_ij above. theta_rot in [0,pi] via
+// ArcCos's principal range (no correction needed); phi_rot wrapped
+// into [0,2*pi) since atan2 alone returns (-pi,pi].
+//
+// Paste into an ADS Eqn (equation) component; theta, phi, x_rot,
+// y_rot, z_rot must already be defined as ADS variables.
+Sph2Cart_11=cos(phi)*sin(theta);
+Sph2Cart_12=cos(phi)*cos(theta);
+Sph2Cart_13=-sin(phi);
+Sph2Cart_21=sin(phi)*sin(theta);
+Sph2Cart_22=cos(theta)*sin(phi);
+Sph2Cart_23=cos(phi);
+Sph2Cart_31=cos(theta);
+Sph2Cart_32=-sin(theta);
+Sph2Cart_33=0;
+r_rot=sqrt((x_rot)**2+(y_rot)**2+(z_rot)**2);
+rho_rot=sqrt((x_rot)**2+(y_rot)**2);
+Cart2Sph_11=(x_rot)/(r_rot);
+Cart2Sph_12=(y_rot)/(r_rot);
+Cart2Sph_13=(z_rot)/(r_rot);
+Cart2Sph_21=((x_rot)*(z_rot))/((r_rot)*(rho_rot));
+Cart2Sph_22=((y_rot)*(z_rot))/((r_rot)*(rho_rot));
+Cart2Sph_23=-((rho_rot)/(r_rot));
+Cart2Sph_31=-((y_rot)/(rho_rot));
+Cart2Sph_32=(x_rot)/(rho_rot);
+Cart2Sph_33=0;
+theta_rot=acos((z_rot)/(r_rot));
+phi_rot_raw=atan2(y_rot,x_rot);
+phi_rot=if (phi_rot_raw<0) then (phi_rot_raw+2*pi) else (phi_rot_raw) endif;

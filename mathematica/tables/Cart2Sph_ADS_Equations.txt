@@ -1,0 +1,43 @@
+// Cart2Sph_ij: PLAIN ANGLE-BASED trig, function of theta,phi --
+// use directly for the OBSERVATION direction (a direct input, no
+// inverse trig needed).
+//
+// M_ij,r_of_xyz,rho_of_xyz,theta_of_xyz,phi_of_xyz: GENERIC
+// Cartesian-ratio template, function of plain x,y,z,r, NOT
+// evaluated at any specific point. create_vector_field_rotation_vars.py
+// uses this, index-transposed (M_ij -> M_ji) and with x,y,z,r,rho
+// renamed to x_prime,y_prime,z_prime,r_prime,rho_prime, to build Sph2Cart at
+// the BODY-FRAME direction -- avoiding any inverse trig on
+// theta_prime,phi_prime inside the matrix entries themselves.
+// theta_of_xyz,phi_of_xyz (renamed theta_prime,phi_prime) are
+// REPORTING-ONLY there -- not used inside M_ij. theta_of_xyz in
+// [0,pi] via ArcCos's principal range (no correction needed);
+// phi_of_xyz wrapped into [0,2*pi) since atan2 alone returns
+// (-pi,pi].
+//
+// Paste into an ADS Eqn (equation) component; theta,phi (for
+// Cart2Sph_ij) and x,y,z (for the generic template) must already
+// be defined as ADS variables -- see create_vector_field_rotation_vars.py.
+Cart2Sph_11=cos(phi)*sin(theta);
+Cart2Sph_12=sin(phi)*sin(theta);
+Cart2Sph_13=cos(theta);
+Cart2Sph_21=cos(phi)*cos(theta);
+Cart2Sph_22=cos(theta)*sin(phi);
+Cart2Sph_23=-sin(theta);
+Cart2Sph_31=-sin(phi);
+Cart2Sph_32=cos(phi);
+Cart2Sph_33=0;
+r_of_xyz=sqrt(x**2+y**2+z**2);
+rho_of_xyz=sqrt(x**2+y**2);
+M_11=x/r;
+M_12=y/r;
+M_13=z/r;
+M_21=(x*z)/(r*rho);
+M_22=(y*z)/(r*rho);
+M_23=-(rho/r);
+M_31=-(y/rho);
+M_32=x/rho;
+M_33=0;
+theta_of_xyz=acos(z/r);
+phi_of_xyz_raw=atan2(y,x);
+phi_of_xyz=if (phi_of_xyz_raw<0) then (phi_of_xyz_raw+2*pi) else (phi_of_xyz_raw) endif;

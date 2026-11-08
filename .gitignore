@@ -1,0 +1,33 @@
+# Generated output (Touchstone files, netlists, figures, caches)
+output/
+*.s[0-9]p
+*.s[0-9][0-9]p
+*.ckt
+*.mdf
+*.fig
+*.png
+*.svg
+*.pdf
+
+# MATLAB / Simulink
+*.asv
+*.m~
+*.autosave
+*.slxc
+slprj/
+*.mex*
+*.mat
+*.slx.original
+
+# Python
+__pycache__/
+*.pyc
+
+# ADS workspaces
+*_wrk/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+!docs/**/*.png

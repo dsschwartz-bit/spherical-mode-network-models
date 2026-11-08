@@ -1,0 +1,8 @@
+* text=auto
+*.m   text diff=matlab
+*.py  text diff=python
+*.wl  text
+*.nb  text -diff
+*.txt text
+*.tex text
+*.png binary

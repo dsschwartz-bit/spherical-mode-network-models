@@ -1,0 +1,5 @@
+magU_def	"sqrt(Ux^2 + Uy^2 + Uz^2)"		
+i/j	1	2	3
+1	"(Ux^2 + (Uy^2 + Uz^2)*cos(alpha))/magU^2"	"(Ux*Uy - Ux*Uy*cos(alpha) - magU*Uz*sin(alpha))/magU^2"	"(Ux*Uz - Ux*Uz*cos(alpha) + magU*Uy*sin(alpha))/magU^2"
+2	"(Ux*Uy - Ux*Uy*cos(alpha) + magU*Uz*sin(alpha))/magU^2"	"(Uy^2 + (Ux^2 + Uz^2)*cos(alpha))/magU^2"	"(Uy*Uz - Uy*Uz*cos(alpha) - magU*Ux*sin(alpha))/magU^2"
+3	"(Ux*Uz - Ux*Uz*cos(alpha) - magU*Uy*sin(alpha))/magU^2"	"(Uy*Uz - Uy*Uz*cos(alpha) + magU*Ux*sin(alpha))/magU^2"	"(Uz^2 + (Ux^2 + Uy^2)*cos(alpha))/magU^2"

@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>:root{color-scheme:light}body{margin:0}</style>
+</head>
+<body>
+<title>Spherical-Mode Workflow Guide</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one block diagram per stage of the toolbox, blocks on a grid, connectors drawn in SVG from the block positions. */
+:root{
+  --bg:#f8f7f4; --panel:#ffffff; --ink:#1c1c20; --muted:#63636d; --line:#dedbd3; --wire:#8a8792;
+  --imp:#c99400; --imp-bg:#fdf2c6; --imp-ink:#5f4600;
+  --mod:#2b9a57; --mod-bg:#d9f2e2; --mod-ink:#14532d;
+  --ads:#dc2626; --ads-bg:#fde0de; --ads-ink:#8f1a1a;
+  --slx:#2563eb; --slx-bg:#dbe8fd; --slx-ink:#1e3f9e;
+  --val:#4f46e5; --val-bg:#e6e4fb; --val-ink:#2e2794;
+  --oth:#8f8f99; --oth-bg:#efeeea; --oth-ink:#3c3c44;
+  --sans:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#131317; --panel:#1b1b21; --ink:#ececf1; --muted:#9d9daa; --line:#2d2d36; --wire:#7b7b88;
+  --imp:#f2c94c; --imp-bg:rgba(242,201,76,.14); --imp-ink:#f6db8c;
+  --mod:#4fd18b; --mod-bg:rgba(79,209,139,.13); --mod-ink:#a3e9c3;
+  --ads:#f87171; --ads-bg:rgba(248,113,113,.14); --ads-ink:#fdc4c4;
+  --slx:#60a5fa; --slx-bg:rgba(96,165,250,.15); --slx-ink:#c1dafc;
+  --val:#8b85ff; --val-bg:rgba(139,133,255,.17); --val-ink:#cdcaff;
+  --oth:#6f6f7b; --oth-bg:rgba(255,255,255,.05); --oth-ink:#c9c9d2; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#131317; --panel:#1b1b21; --ink:#ececf1; --muted:#9d9daa; --line:#2d2d36; --wire:#7b7b88;
+  --imp:#f2c94c; --imp-bg:rgba(242,201,76,.14); --imp-ink:#f6db8c;
+  --mod:#4fd18b; --mod-bg:rgba(79,209,139,.13); --mod-ink:#a3e9c3;
+  --ads:#f87171; --ads-bg:rgba(248,113,113,.14); --ads-ink:#fdc4c4;
+  --slx:#60a5fa; --slx-bg:rgba(96,165,250,.15); --slx-ink:#c1dafc;
+  --val:#8b85ff; --val-bg:rgba(139,133,255,.17); --val-ink:#cdcaff;
+  --oth:#6f6f7b; --oth-bg:rgba(255,255,255,.05); --oth-ink:#c9c9d2; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1{font-size:clamp(22px,3.2vw,30px);margin:0 0 6px;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:18px;margin:0 0 4px;text-wrap:balance}
+.lede{color:var(--muted);max-width:72ch;margin:0 0 16px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 28px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:14px;height:14px;border-radius:3px;border:2px solid;display:inline-block}
+.legend .imp{background:var(--imp-bg);border-color:var(--imp)} .legend .mod{background:var(--mod-bg);border-color:var(--mod)}
+.legend .ads{background:var(--ads-bg);border-color:var(--ads)} .legend .slx{background:var(--slx-bg);border-color:var(--slx)}
+.legend .val{background:var(--val-bg);border-color:var(--val)}
+.legend .oth{background:var(--oth-bg);border-color:var(--oth);border-style:dashed}
+section{margin:0 0 40px}
+section > p{color:var(--muted);margin:0 0 14px;max-width:80ch}
+.wrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.dia{position:relative;display:grid;gap:46px 22px;padding:22px;min-width:0}
+.dia svg.wires{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.wires path{fill:none;stroke:var(--wire);stroke-width:1.6}
+.wires .arrow{fill:var(--wire)}
+.blk{position:relative;z-index:1;border:2px solid;border-radius:8px;padding:10px 12px 11px;align-self:stretch;min-width:0}
+.blk h3{font-size:13.5px;font-weight:700;margin:0 0 6px;line-height:1.3}
+.blk ul{margin:0;padding-left:16px}
+.blk li{font-family:var(--mono);font-size:12px;line-height:1.5;overflow-wrap:break-word}
+.blk li span{font-family:var(--sans);color:var(--muted)}
+.blk .out{margin:7px 0 0;font-size:11.5px;color:var(--muted);font-family:var(--mono);overflow-wrap:anywhere}
+.blk .tag{position:absolute;top:-9px;right:10px;font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:0 6px;border-radius:4px;background:var(--panel)}
+.imp{background:var(--imp-bg);border-color:var(--imp);color:var(--imp-ink)}
+.mod{background:var(--mod-bg);border-color:var(--mod);color:var(--mod-ink)}
+.ads{background:var(--ads-bg);border-color:var(--ads);color:var(--ads-ink)}
+.slx{background:var(--slx-bg);border-color:var(--slx);color:var(--slx-ink)}
+.val{background:var(--val-bg);border-color:var(--val);color:var(--val-ink)}
+.oth{background:var(--oth-bg);border-color:var(--oth);border-style:dashed;color:var(--oth-ink)}
+.blk .tag{color:var(--muted)}
+.colhead{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);align-self:end}
+/* diagram A: import | model | fit | build */
+#dA{grid-template-columns:repeat(4,minmax(200px,1fr))}
+/* diagram B: ADS, three columns snaking */
+#dB{grid-template-columns:minmax(280px,560px) minmax(220px,380px);justify-content:center}
+/* diagram C: Simulink */
+#dC{grid-template-columns:repeat(3,minmax(220px,1fr))}
+#dD{grid-template-columns:repeat(4,minmax(200px,1fr))}
+.note{font-size:12.5px;color:var(--muted);margin:10px 2px 0;max-width:90ch}
+code{font-family:var(--mono);font-size:12.5px}
+@media (max-width:760px){
+  .dia{grid-template-columns:1fr !important;gap:26px}
+  .dia > *{grid-column:1 !important;grid-row:auto !important}
+  .colhead{display:none}
+}
+</style>
+
+<main>
+  <h1>Spherical-mode network models: how to use the workflows</h1>
+  <p class="lede">Each block says what the step accomplishes and lists the scripts and functions to use. Run the MATLAB scripts after editing their USER SETTINGS block; the functions in the bullets are called by those scripts.</p>
+  <div class="legend">
+    <span><i class="imp"></i>Import from the EM solver</span>
+    <span><i class="mod"></i>Spherical-mode expansion, S-parameters, rational-fit SPICE</span>
+    <span><i class="ads"></i>Build and simulate in ADS</span>
+    <span><i class="slx"></i>Build and simulate in Simulink</span>
+    <span><i class="val"></i>Compare with the full-wave results (validation/)</span>
+    <span><i class="oth"></i>Optional step</span>
+  </div>
+
+  <section>
+    <h2>1. From a full-wave simulation to a network model</h2>
+    <p>Pick the column for your solver and antenna. Every column ends in the same Touchstone file of feed, internal and dominant mode ports, which the rational fit and both circuit simulators use.</p>
+    <div class="wrap"><div class="dia" id="dA">
+
+      <div class="blk imp" id="a1" style="grid-column:1;grid-row:1">
+        <h3>Read FEKO exports (single feed)</h3>
+        <ul><li>ReadFEKOout <span>— port, apothem, symmetry</span></li><li>ReadFE_spherical <span>— .efe / .hfe</span></li><li>ReadFF_spherical <span>— .ffe</span></li><li>ReadSphModes_freqs <span>— .sph (Q)</span></li></ul>
+      </div>
+      <div class="blk mod" id="b1" style="grid-column:1;grid-row:2">
+        <h3>Project fields onto modes, rank them, build the S-matrix</h3>
+        <ul><li>general_vector_spherical_modes_FEKO.m</li><li>…_FEKO_Qonly.m <span>— .sph only</span></li><li>compute_mode_coeffs_nearfield / _farfield / _Q</li><li>gradYlm, Spherical_Mode_Field</li></ul>
+      </div>
+
+      <div class="blk imp" id="a2" style="grid-column:2;grid-row:1">
+        <h3>Read FEKO exports (feed + internal load ports)</h3>
+        <ul><li>ReadFEKOout_loadports</li><li>ReadFE_spherical, ReadFF_spherical</li><li>ReadSphModes_freqs</li></ul>
+      </div>
+      <div class="blk mod" id="b2" style="grid-column:2;grid-row:2">
+        <h3>Per-port mode coefficients and the multi-port S-matrix</h3>
+        <ul><li>general_vector_spherical_modes_loadports_FEKO.m</li><li>…_loadports_FEKO_Qonly.m</li><li>compute_port_mode_coeffs_nearfield / _farfield / _Q</li></ul>
+      </div>
+
+      <div class="blk imp" id="a3" style="grid-column:3;grid-row:1">
+        <h3>Read CST far-field and Touchstone exports</h3>
+        <ul><li>discover_cst_farfield_files</li><li>read_cst_farfield</li><li>cst_unit_scale</li></ul>
+      </div>
+      <div class="blk mod" id="b3" style="grid-column:3;grid-row:2">
+        <h3>Far-field mode expansion and S-matrix (CST)</h3>
+        <ul><li>general_vector_spherical_modes_loadports_CST.m</li><li>gradYlm, reconstruct_farfield_from_modes</li></ul>
+      </div>
+
+      <div class="blk imp" id="a4" style="grid-column:4;grid-row:1">
+        <h3>Export and read HFSS far fields</h3>
+        <ul><li>python/hfss/ExportFarFields.py <span>— run in HFSS</span></li><li>importffarfield_HFSS, farFieldColumn</li></ul>
+      </div>
+      <div class="blk mod" id="b4" style="grid-column:4;grid-row:2">
+        <h3>Far-field mode expansion and S-matrix (HFSS)</h3>
+        <ul><li>general_vector_spherical_modes_loadports_HFSS.m</li><li>gradYlm, reconstruct_farfield_from_modes</li></ul>
+      </div>
+
+      <div class="blk mod" id="c1" style="grid-column:1 / span 3;grid-row:3">
+        <span class="tag">output/SnP</span>
+        <h3>Rational fit and SPICE netlist</h3>
+        <ul><li>generate_rationalfit_spice.m</li><li>rationalfit / rational, generateSPICE <span>— RF Toolbox</span></li><li>fix_rational_fit_netlist <span>— port names</span></li><li>add_gmin_to_rational_fit_netlist</li></ul>
+        <p class="out">→ rationalfit/*.ckt, *_Rfit.mat</p>
+      </div>
+      <div class="blk oth" id="c2" style="grid-column:4;grid-row:3">
+        <h3>Check causality of the S-parameters</h3>
+        <ul><li>check_snp_causality.m</li><li>validation/cst_ads/time_signals/filter_excitation_gaussian.m</li></ul>
+      </div>
+
+      <div class="blk ads" id="d1" style="grid-column:1 / span 2;grid-row:4">
+        <h3>Build and simulate the link in ADS</h3>
+        <ul><li>python/ads/*.py <span>— see section 2</span></li></ul>
+      </div>
+      <div class="blk slx" id="d2" style="grid-column:3 / span 2;grid-row:4">
+        <h3>Build and simulate the link in Simulink</h3>
+        <ul><li>matlab/simulink, matlab/workflows <span>— see section 3</span></li></ul>
+      </div>
+      <svg class="wires" aria-hidden="true"></svg>
+    </div></div>
+    <p class="note">Every mode-expansion script writes <code>output/SnP/S_dom_*_&lt;antenna&gt;.sNp</code>: the feed and internal ports first, then the dominant TM/TE modes (named <code>TM_L&lt;l&gt;_M&lt;m&gt;</code>). FEKO files without a mesh ask for the antenna apothem.</p>
+    <script type="application/json" data-for="dA">[["a1","b1"],["a2","b2"],["a3","b3"],["a4","b4"],["b1","c1"],["b2","c1"],["b3","c1"],["b4","c1"],["c1","c2",1],["c1","d1"],["c1","d2"]]</script>
+  </section>
+
+  <section>
+    <h2>2. Build and simulate the link in Keysight ADS</h2>
+    <p>Run in the ADS Python console, top to bottom. The equation cells are built once per workspace; the antenna cells and the link schematic are built for each pair of Touchstone files.</p>
+    <div class="wrap"><div class="dia" id="dB">
+      <div class="blk oth" id="e0" style="grid-column:2;grid-row:2">
+        <h3>Regenerate the equation tables (only if changed)</h3>
+        <ul><li>mathematica/LegendreFThetaFPhi.wl</li><li>rotation3D.wl, spherical_coordinate_transform.wl</li><li>vector_field_spherical_coordinate_transform.wl</li></ul>
+        <p class="out">→ mathematica/tables (included in the repo)</p>
+      </div>
+      <div class="blk ads" id="e1" style="grid-column:1;grid-row:1">
+        <h3>Open the workspace and load the scripts</h3>
+        <ul><li>start_console.py <span>— set WORKSPACE_PATH</span></li><li>run_script(&quot;…&quot;)</li></ul>
+      </div>
+      <div class="blk ads" id="e2" style="grid-column:1;grid-row:2">
+        <h3>Build the harmonic and rotation equation cells (once)</h3>
+        <ul><li>main_rebuild_gradYlm_data.py <span>— runs the four below</span></li><li>create_Fdata_vars, create_Fdata_prime_vars</li><li>create_gradYlm_vars, create_gradYlm_vars_prime</li><li>create_rotationmat_vars, create_vector_field_rotation_vars</li></ul>
+      </div>
+      <div class="blk ads" id="e3" style="grid-column:1;grid-row:3">
+        <h3>Build the antenna cells (Touchstone or rational fit)</h3>
+        <ul><li>create_snp_dual_view_cells.py <span>— create_snp_component_cell</span></li><li>fix_rational_fit_netlist.py, then File ▸ Import ▸ Netlist</li><li>redraw_symbol_for_imported_cell</li><li>rebuild_snp_cells.py <span>— refresh later</span></li></ul>
+      </div>
+      <div class="blk ads" id="e4" style="grid-column:1;grid-row:4">
+        <h3>Build the Tx-to-Rx link schematic</h3>
+        <ul><li>create_tx_rx_link.py <span>— feed + modes</span></li><li>create_tx_rx_link_internal_ports.py <span>— with load ports</span></li><li>…_internal_ports_TRANSIENT.py <span>— transient</span></li><li>create_vcvs_tx_gain, create_cccs_rx_aperture <span>— loaded automatically</span></li></ul>
+      </div>
+      <div class="blk ads" id="e5" style="grid-column:1;grid-row:5">
+        <h3>Prepare transient excitations and simulate</h3>
+        <ul><li>cst_to_ads_mdf.m, generate_mdf <span>— CST port signals → MDF</span></li><li>generate_user_excitations.m</li><li>ook_cst_to_ads_mdf.m <span>— OOK</span></li><li>Simulate in ADS; export the data display to CSV</li></ul>
+      </div>
+      <svg class="wires" aria-hidden="true"></svg>
+    </div></div>
+    <p class="note">The excitation scripts are in <code>validation/cst_ads/time_signals/</code>; <code>generate_mdf</code> is in <code>matlab/io/ads</code>. With internal load ports the antenna cell must have one reference pin per port. <code>inspect_design.py</code> prints a schematic's contents.</p>
+    <script type="application/json" data-for="dB">[["e0","e1",1],["e1","e2"],["e2","e3"],["e3","e4"],["e4","e5"]]</script>
+  </section>
+
+  <section>
+    <h2>3. Build and simulate the link in Simulink</h2>
+    <p>The builder makes an RF Blockset model by default (<code>'Platform','simscape'</code> for Simscape). Each workflow script below calls it with its own settings.</p>
+    <div class="wrap"><div class="dia" id="dC">
+
+      <div class="blk slx" id="f0" style="grid-column:3;grid-row:1">
+        <h3>Define the excitations</h3>
+        <ul><li>generate_user_excitations.m</li><li>CST port V/I exports <span>— importCSTSignal</span></li></ul>
+      </div>
+      <div class="blk slx" id="f1" style="grid-column:1 / span 2;grid-row:1">
+        <span class="tag">matlab/simulink</span>
+        <h3>Build the spherical-mode link model</h3>
+        <ul><li>build_tx_rx_link_simulink <span>— Tx–Rx or 'TxOnly'</span></li><li>link_update_gains <span>— new r, θ, φ without rebuilding</span></li></ul>
+        <p class="out">→ output/simulink/&lt;model&gt;.slx + _vars.mat</p>
+      </div>
+
+      <div class="blk slx" id="g1" style="grid-column:1;grid-row:2">
+        <h3>Simulate a Tx-to-Rx link at distance r</h3>
+        <ul><li>matlab/workflows/run_tx_rx_link_simulink.m</li></ul>
+        <p class="out">plots Vθ, Vφ and the Rx feed voltage</p>
+      </div>
+      <div class="blk slx" id="g2" style="grid-column:2;grid-row:2">
+        <h3>Radiated field of a pulse-driven transmitter</h3>
+        <ul><li>matlab/workflows/run_tx_radiated_simulink.m</li><li>simulinkRadiatedField <span>— cached per direction</span></li></ul>
+        <p class="out">r·E<sub>θ</sub>(t), r·E<sub>φ</sub>(t), e.g. Gaussian sine</p>
+      </div>
+      <div class="blk slx" id="g3" style="grid-column:3;grid-row:2">
+        <h3>On-off keying with a switch at the internal port</h3>
+        <ul><li>matlab/workflows/ook/run_ook_simulink_rf.m</li><li>ook_load_excitation, ook_observation_loop</li></ul>
+      </div>
+
+      <div class="blk val" id="h1" style="grid-column:1;grid-row:3">
+        <h3>Compare with CST and ADS</h3>
+        <ul><li>validation/simulink/compare_simulink_ADS_CST.m</li></ul>
+      </div>
+      <div class="blk val" id="h2" style="grid-column:2;grid-row:3">
+        <h3>Compare radiated fields</h3>
+        <ul><li>validation/cst_ads/time_signals/compare_radiated_fields.m</li></ul>
+      </div>
+      <div class="blk val" id="h3" style="grid-column:3;grid-row:3">
+        <h3>Compare OOK with CST and ADS</h3>
+        <ul><li>validation/simulink/ook/compare_ook_CST_ADS_simulink.m</li></ul>
+      </div>
+      <svg class="wires" aria-hidden="true"></svg>
+    </div></div>
+    <p class="note">Simulink solver: <code>ode45</code> for linear links, <code>ode15s</code> with the OOK switch; the RF circuit steps at MaxStep (default Nyquist/6) either way. OOK can also use the stored rational fit (<code>rf_fit = "file"</code>, the <code>_Rfit.mat</code> from section 1).</p>
+    <script type="application/json" data-for="dC">[["f0","f1"],["f1","g1"],["f1","g2"],["f1","g3"],["g1","h1",1],["g2","h2",1],["g3","h3",1]]</script>
+  </section>
+
+  <section>
+    <h2>4. Compare the circuit models with the full-wave results</h2>
+    <p>Export the results first (top block). Each script below reads them from the folders set in its USER SETTINGS block and plots the full-wave and circuit results together with the error between them. Run whichever comparisons apply to your antenna.</p>
+    <div class="wrap"><div class="dia" id="dD">
+      <div class="blk oth" id="v0" style="grid-column:1 / span 4;grid-row:1">
+        <h3>Export the results to compare</h3>
+        <ul><li>ADS: data display <span>▸ export to CSV</span></li><li>FEKO: .dat / .s2p / .s4p <span>— POSTFEKO</span></li><li>CST: far-field, probe and port signals <span>— ASCII export</span></li></ul>
+      </div>
+      <div class="blk val" id="v1" style="grid-column:1;grid-row:2">
+        <h3>FEKO vs ADS: plane-wave load currents</h3>
+        <ul><li>validation/feko_ads/pw_excitation/plot_current_comparison.m</li><li>…/plot_current_comparison_2.m</li></ul>
+      </div>
+      <div class="blk val" id="v2" style="grid-column:2;grid-row:2">
+        <h3>FEKO vs ADS: radiated rE voltage and Tx–Rx transmission</h3>
+        <ul><li>validation/feko_ads/pw_radiation/plot_rE_voltage_comparison.m</li><li>…/loop_not_rotated/plot_loop_rE_voltage_comparison.m</li><li>validation/feko_ads/txrx/plot_transmission_comparison.m</li></ul>
+      </div>
+      <div class="blk val" id="v3" style="grid-column:3;grid-row:2">
+        <h3>FEKO vs ADS: impulse and RF-pulse responses</h3>
+        <ul><li>validation/feko_ads/time_domain/plot_impulse_comparison.m</li><li>…/plot_RFpulse_comparison.m</li></ul>
+      </div>
+      <div class="blk val" id="v4" style="grid-column:4;grid-row:2">
+        <h3>CST vs ADS: far-field patterns and S11</h3>
+        <ul><li>validation/cst_ads/farfield/compare_cst_ads_farfields.m</li><li>…/compare_S11_CST_ADS.m</li><li>…/plot_cst_farfields.m</li></ul>
+      </div>
+      <div class="blk val" id="v5" style="grid-column:1 / span 2;grid-row:3">
+        <h3>CST vs ADS: radiated time signals</h3>
+        <ul><li>validation/cst_ads/time_signals/compare_rE_time_at_probe_CST_ADS.m</li><li>…/plot_rE_radial_CST_ADS.m</li><li>…/plot_group_delay_radiated.m</li><li>…/compare_radiated_fields.m <span>— with Simulink</span></li></ul>
+      </div>
+      <div class="blk val" id="v6" style="grid-column:3 / span 2;grid-row:3">
+        <h3>CST vs ADS (and Simulink): on-off keying</h3>
+        <ul><li>validation/cst_ads/time_signals/ook/ook_ideal_vs_radiated_spectrum.m</li><li>…/ook_plot_rE_radial.m</li><li>validation/simulink/ook/compare_ook_CST_ADS_simulink.m</li></ul>
+      </div>
+      <svg class="wires" aria-hidden="true"></svg>
+    </div></div>
+    <p class="note">Shared helpers: <code>validation/feko_ads/common</code> (plot style, labels) and <code>validation/cst_ads/time_signals/utils</code> (<code>radialTracePlot</code>, <code>plotCSTSignal</code>). Generated files go to <code>output/</code> in the repository.</p>
+    <script type="application/json" data-for="dD">[]</script>
+  </section>
+</main>
+
+<script>
+(function(){
+  const NS = 'http://www.w3.org/2000/svg';
+  function draw(dia){
+    const svg = dia.querySelector('svg.wires');
+    const spec = document.querySelector('script[data-for="'+dia.id+'"]');
+    if (!svg || !spec) return;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    const narrow = window.matchMedia('(max-width: 760px)').matches;
+    const defs = document.createElementNS(NS,'defs');
+    defs.innerHTML = '<marker id="ah-'+dia.id+'" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="arrow" d="M0,0 L10,5 L0,10 z"/></marker>';
+    svg.appendChild(defs);
+    const base = dia.getBoundingClientRect();
+    const box = id => { const r = document.getElementById(id).getBoundingClientRect();
+      return {l:r.left-base.left, r:r.right-base.left, t:r.top-base.top, b:r.bottom-base.top, cx:(r.left+r.right)/2-base.left, cy:(r.top+r.bottom)/2-base.top}; };
+    let edges; try { edges = JSON.parse(spec.textContent); } catch(e){ return; }
+    const nextBlk = id => { let n = document.getElementById(id).nextElementSibling;
+      while (n && !n.classList.contains('blk')) n = n.nextElementSibling; return n && n.id; };
+    edges.forEach(([from,to,dashed]) => {
+      const a = box(from), b = box(to);
+      let d;
+      const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+      if (b.t >= a.b - 1) {                       // target below: down, with one jog if needed
+        if (narrow && nextBlk(from) !== to) return;   // stacked on a phone: only link neighbours
+        const x1 = clamp(b.cx, a.l + 16, a.r - 16), x2 = clamp(x1, b.l + 16, b.r - 16);
+        const y1 = a.b, y2 = b.t - 2, ym = y1 + (y2 - y1) / 2;
+        d = Math.abs(x1 - x2) < 1 ? `M${x1},${y1} V${y2}` : `M${x1},${y1} V${ym} H${x2} V${y2}`;
+      } else if (narrow) {
+        return;
+      } else if (b.l >= a.r - 1) {                // same row, to the right
+        d = `M${a.r},${a.cy} H${b.l - 2}`;
+      } else if (b.r <= a.l + 1) {                // same row, to the left
+        d = `M${a.l},${a.cy} H${b.r + 2}`;
+      } else return;
+      const p = document.createElementNS(NS,'path');
+      p.setAttribute('d', d);
+      p.setAttribute('marker-end', 'url(#ah-'+dia.id+')');
+      if (dashed) p.setAttribute('stroke-dasharray','5 4');
+      svg.appendChild(p);
+    });
+  }
+  // allow long file names to break after underscores and slashes (copying is unaffected)
+  document.querySelectorAll('.blk li, .blk .out').forEach(li => {
+    [...li.childNodes].forEach(n => {
+      if (n.nodeType !== 3 || !/[_\/]/.test(n.textContent)) return;
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(?<=[_\/])/).forEach((part, i) => { if (i) frag.appendChild(document.createElement('wbr')); frag.appendChild(document.createTextNode(part)); });
+      li.replaceChild(frag, n);
+    });
+  });
+  function all(){ document.querySelectorAll('.dia').forEach(draw); }
+  window.addEventListener('resize', () => { clearTimeout(window.__wt); window.__wt = setTimeout(all, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(all);
+  window.addEventListener('load', all);
+  all();
+})();
+</script>
+
+</body>
+</html>
